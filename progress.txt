@@ -1,7 +1,3 @@
-
-
-start working on permissions views and serialization
-
-sytart working on authentication and authorization
-
-procced to token 
+//to procceed with Multilanguage,
+// Ballot Confirmation
+//cast vote , ussd
