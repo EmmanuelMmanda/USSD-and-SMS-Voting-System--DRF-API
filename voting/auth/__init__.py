@@ -1,0 +1,2 @@
+from .permissions import IsSuperuserOrReadOnly
+from .authentication import IsAuthenticated
