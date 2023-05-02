@@ -5,6 +5,8 @@ from voting.views import ElectionPositionsView
 from ussd.utils.Menus import USSDMenu
 from ussd.utils.ussd_response import USSDResponseHandler
 from rest_framework.request import Request
+
+from voting.views.Settings_view import getSeetingsByUser
 from .resultHandller import Results
 
 
@@ -12,13 +14,15 @@ request_factory = RequestFactory()
 request = request_factory.get('/')
 
 class USSDVoting:
-    def __init__(self):
+    def __init__(self,request):
         self.voter = VotersDetailView()
         self.candidates = CandidateListView()
         self.positions = ElectionPositionsView()
-        self.lang = 'SW'
+        self.lang = self.get_settings_by_user(self.voter)
         self.menu = USSDMenu(self.lang)
         self.response = USSDResponseHandler(self.lang)
+
+    
 
     def getCandidates(self):
         response = self.candidates.get(request, 1)
@@ -101,7 +105,12 @@ class USSDVoting:
         elif text_array[0] == '3':
             # try change language
             try:
-                response = self.menu.changeLanguageSuccess()
+                usersettings = self.get_settings_by_user(self.voter__user)
+                if usersettings.language == 'EN':
+                    self.lang = 'SW'
+                    response = self.menu.changeLanguageSuccess()
+                else:
+                    self.lang = 'EN'
             except:
                 response = self.response.Error()
 
@@ -125,4 +134,13 @@ class USSDVoting:
         
         return self.response.resultMenu(ArusoResults)
     
+    def get_settings_by_user(self,user):
+        try:
+            settings = getSeetingsByUser()
+            userSettings = settings.get(user=user)
+
+            return userSettings
+        except:
+            return 'Error fetching user settings'
+        
 

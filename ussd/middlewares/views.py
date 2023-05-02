@@ -1,18 +1,25 @@
 from django.http import HttpResponse
+from django.test import RequestFactory
 from ..utils import USSDVoting
 import re
 from django.contrib.auth.models import User
+from voting.views import getSeetingsByUser
 
 
-USSDHandler = USSDVoting().USSDHandler
+request_factory = RequestFactory()
+request = request_factory.get('/')
+USSDHandler = USSDVoting(request).USSDHandler
 
-#get user by phone number from django user model
+# get user by phone number from django user model
+
+
 def get_user_by_phone(phone_number):
     try:
         user = User.objects.get(voter__phone_number=phone_number)
         return user
     except User.DoesNotExist:
         return None
+
 
 class PhoneNumber:
     def __init__(self, number):
@@ -29,8 +36,8 @@ class PhoneNumber:
         elif self.number.startswith('+255'):
             return '0' + self.number[4:]
         else:
-            raise ValueError('Invalid phone number format provided for %s' % self.number)
-
+            raise ValueError(
+                'Invalid phone number format provided for %s' % self.number)
 
 
 class USSDMiddleware:
@@ -51,12 +58,15 @@ class USSDMiddleware:
 
             phone_number = phone.normalize()
 
-            ussd_response = USSDHandler(text,session_id, phone_number)
+            ussd_response = USSDHandler(text, session_id, phone_number)
             response = HttpResponse(ussd_response)
             response['Content-Type'] = 'text/plain'
-            response['data'] = get_user_by_phone(phone_number)
+            user = get_user_by_phone(phone_number)
+            settings = get_settings_by_user(user)
+
+            request.session['settings'] = settings
+            request.session['user'] = user
+
             return response
-        
+
         return self.get_response(request)
-
-

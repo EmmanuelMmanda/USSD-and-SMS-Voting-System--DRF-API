@@ -1,3 +1,7 @@
 //to procceed with Multilanguage,
 // Ballot Confirmation
 //cast vote , ussd
+
+
+
+ended at self.get_settings_by_user(self.voter__user) in ussd init
