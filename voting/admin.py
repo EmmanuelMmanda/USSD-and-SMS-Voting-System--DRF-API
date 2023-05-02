@@ -57,7 +57,8 @@ class ResultsAdmin(admin.ModelAdmin):
                      'candidate__last_name')
     list_filter = ('position__election',)
 
-    
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value', 'user', 'updated_at')  
 
 
 admin.site.register(Voter, VoterAdmin)
@@ -67,7 +68,7 @@ admin.site.register(Candidate, CandidateAdmin)
 admin.site.register(Ballot, BallotAdmin)
 admin.site.register(Vote, VoteAdmin)
 admin.site.register(Results, ResultsAdmin)
-admin.site.register(Settings)
+admin.site.register(Settings, SettingsAdmin)
 
 # Modify the admin site header and title
 admin.site.site_header = "Election Admin Panel"

@@ -15,10 +15,9 @@ class Results:
     def __init__(self):
         self.results = ResultsListView()
         self.generate_results = GenerateResultsView()
-        self.response = USSDResponseHandler('EN')
 
     def get_results(self, election_id, request):
         # get results view from the voting app
         self.generate_results.post(request)
         res = self.results.get(request, election_id)
-        return resultMenu(res.data)
+        return res.data

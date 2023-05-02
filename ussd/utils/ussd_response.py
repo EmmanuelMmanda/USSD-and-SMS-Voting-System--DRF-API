@@ -88,6 +88,7 @@ class USSDResponseHandler:
             menu += f"_______________________________\n"
             menu += f"An SMS will be sent to you with the results."
             return menu
+        
         elif self.lang == 'SW':
             menu = f"END Matokeo ya Kura: \n Jina - kura - asilimia\n _______________________________\n"
             for result in results:

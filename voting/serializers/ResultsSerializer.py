@@ -1,14 +1,6 @@
 # manage the imports
 from rest_framework import serializers
-from voting.models import Position
-from voting.models import Election
-from voting.models import Candidate
-from voting.models import Vote
 from voting.models import Results
-from rest_framework.response import Response
-from django.db.models import Count
-from voting.serializers.CandidateSerializer import CandidateSerializer
-from voting.serializers.PositionSerializer import PositionSerializer
 
 
 class ResultsSerializer(serializers.ModelSerializer):

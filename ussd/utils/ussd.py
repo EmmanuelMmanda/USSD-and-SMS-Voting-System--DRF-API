@@ -122,8 +122,7 @@ class USSDVoting:
     def view_results(self):
         results = Results()
         ArusoResults = results.get_results(1, request)
-        print(ArusoResults)
         
-        return ArusoResults
+        return self.response.resultMenu(ArusoResults)
     
 

@@ -14,6 +14,7 @@ from voting.views import VotesForElectionView
 from voting.views import BallotsListView
 from voting.views import BallotsDetailView
 from voting.views import ResultsListView, GenerateResultsView
+from voting.views import SettingsView, SettingsDetailView,getSeetingsByUser
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
@@ -27,16 +28,15 @@ urlpatterns = [
     # results per election
     path('elections/<int:election_id>/results/',
          ResultsListView.as_view(), name='results-per-election'),
-     #results for all elections
-     path('elections/results/', GenerateResultsView.as_view(), name='all-elections-results'),
+    # results for all elections
+    path('elections/results/', GenerateResultsView.as_view(),
+         name='all-elections-results'),
 
     # Positions
     path('elections/<int:election_id>/positions/',
          ElectionPositionsView.as_view(), name='positions'),
     path('elections/<int:election_id>/positions/<int:position_id>/',
          ElectionPositionsDetailView.as_view(), name='positions-detail'),
-
-
 
     # Candidates
     path('elections/<int:election_id>/candidates/',
@@ -57,6 +57,12 @@ urlpatterns = [
     path('ballots/<int:ballot_id>/',
          BallotsDetailView.as_view(), name='ballot-update'),
 
+    # setting path
+    path('settings/', SettingsView.as_view(), name='setting'),
+    path('settings/<int:setting_id>/',
+         SettingsDetailView.as_view(), name='setting-detail'),
+    path('settings/user/<int:user_id>/',
+         getSeetingsByUser.as_view(), name='getSetingsByUser'),
 
 
 ]

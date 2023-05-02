@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
+
 class IndexView(APIView):
     permission_classes = [ IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
@@ -15,4 +16,3 @@ class IndexView(APIView):
             "timed_at": timezone.now(),
         }
         return Response(data)
-    
