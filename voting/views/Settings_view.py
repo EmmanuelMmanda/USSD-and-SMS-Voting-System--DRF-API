@@ -71,6 +71,23 @@ class SettingsDetailView(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+    def change_language(self, request, setting_id, language):
+        setting = self.get_object(setting_id)
+        if not setting:
+            return Response(
+                {"error": "Setting does not exist."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = SettingsSerializer(setting, data={"language": language}, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class getSeetingsByUser(APIView):

@@ -2,6 +2,7 @@ from django.test import RequestFactory
 from voting.views import VotersDetailView
 from voting.views import CandidateListView
 from voting.views import ElectionPositionsView
+from voting.views import SettingsDetailView
 from ussd.utils.Menus import USSDMenu
 from ussd.utils.ussd_response import USSDResponseHandler
 from rest_framework.request import Request
@@ -13,30 +14,34 @@ from .resultHandller import Results
 request_factory = RequestFactory()
 request = request_factory.get('/')
 
+
 class USSDVoting:
-    def __init__(self,request):
+    def __init__(self, request, UserPrefs):
         self.voter = VotersDetailView()
         self.candidates = CandidateListView()
         self.positions = ElectionPositionsView()
-        self.lang = self.get_settings_by_user(self.voter)
+        self.lang = UserPrefs[0]['language'] if UserPrefs else 'EN'
+        self.settingDetail = SettingsDetailView()
+        self.userPrefs = UserPrefs
         self.menu = USSDMenu(self.lang)
         self.response = USSDResponseHandler(self.lang)
-
-    
 
     def getCandidates(self):
         response = self.candidates.get(request, 1)
         candidates_data = response.data
         return candidates_data
 
-    def USSDHandler(self, text, session_id, phone_number):
+    def USSDHandler(self, text, session_id, phone_number, user):
         # Check if the voter is registered
         is_registered = self.voter.is_registered(phone_number)
-        # has_voted = self.voter.has_voted(phone_number)
         has_voted = False
 
-        # Split USSD input text
+        print(f'phonenumber at ussd.py-> {phone_number}')
+
+        text_array = []
+        # Split USSD input text by asterisk        
         text_array = text.split('*')
+        # Get the length of the text array
         level = len(text_array)
         response = ''
 
@@ -104,16 +109,18 @@ class USSDVoting:
 
         elif text_array[0] == '3':
             # try change language
-            try:
-                usersettings = self.get_settings_by_user(self.voter__user)
-                if usersettings.language == 'EN':
-                    self.lang = 'SW'
-                    response = self.menu.changeLanguageSuccess()
-                else:
-                    self.lang = 'EN'
-            except:
-                response = self.response.Error()
 
+            currentLang = self.lang
+            if currentLang == 'EN':
+                self.lang = 'SW'
+            else:
+                self.lang = 'EN'
+            try:
+                self.settingDetail.change_language(request,
+                    self.userPrefs[0]['id'], self.lang)
+                response = self.menu.changeLanguageSuccess()
+            except Exception as e:
+                response = self.response.Error() + str(e)
             return (response)
         else:
             response = self.response.invalid_input()
@@ -131,16 +138,7 @@ class USSDVoting:
     def view_results(self):
         results = Results()
         ArusoResults = results.get_results(1, request)
-        
+
         return self.response.resultMenu(ArusoResults)
+
     
-    def get_settings_by_user(self,user):
-        try:
-            settings = getSeetingsByUser()
-            userSettings = settings.get(user=user)
-
-            return userSettings
-        except:
-            return 'Error fetching user settings'
-        
-

@@ -119,13 +119,10 @@ class Results(models.Model):
         verbose_name_plural = "Results"
 
 class Settings(models.Model):
-    key = models.CharField(max_length=100, unique=True)
-    value = models.CharField(max_length=100)
+    language = models.CharField(max_length=100, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
 
     unique_together = ('key', 'user') 
 
-    def __str__(self):
-        return self.key + " : " + self.value    
-
+    

@@ -1,43 +1,36 @@
-from django.http import HttpResponse
-from django.test import RequestFactory
-from ..utils import USSDVoting
 import re
+from django.http import HttpResponse
 from django.contrib.auth.models import User
+from ..utils import USSDVoting
 from voting.views import getSeetingsByUser
 
 
-request_factory = RequestFactory()
-request = request_factory.get('/')
-USSDHandler = USSDVoting(request).USSDHandler
-
-# get user by phone number from django user model
-
-
 def get_user_by_phone(phone_number):
+    """
+    Get the user from the Django User model based on the phone number.
+    """
     try:
-        user = User.objects.get(voter__phone_number=phone_number)
-        return user
+        users = User.objects.filter(voter__phone_number=phone_number)
+        return users
     except User.DoesNotExist:
         return None
 
 
-class PhoneNumber:
-    def __init__(self, number):
-        self.number = number
-
-    def is_valid(self):
-        return bool(re.match(r'^(\+?255|0)[67]\d{8}$', self.number))
-
-    def normalize(self):
-        if self.number.startswith('0'):
-            return self.number
-        elif self.number.startswith('255'):
-            return '0' + self.number[3:]
-        elif self.number.startswith('+255'):
-            return '0' + self.number[4:]
-        else:
-            raise ValueError(
-                'Invalid phone number format provided for %s' % self.number)
+def normalize_phone_number(phone_number):
+    # Remove the country code prefix if present
+    if phone_number.startswith('+255'):
+        phone_number = phone_number[4:]
+    elif phone_number.startswith('255'):
+        phone_number = phone_number[3:]
+    elif phone_number.startswith('0'):
+        phone_number = phone_number[1:]
+    else:
+        raise ValueError(' Invalid phone number')
+    
+    # Add the "07" prefix to the phone number
+    formatted_phone_number = '07' + phone_number[1:]
+    
+    return formatted_phone_number
 
 
 class USSDMiddleware:
@@ -50,23 +43,39 @@ class USSDMiddleware:
             phone_number = request.POST.get('phoneNumber')
             text = request.POST.get('text')
 
-            phone = PhoneNumber(phone_number)
-            if not phone.is_valid():
-                # Invalid phone number format, return an error response
-                response = HttpResponse('Invalid phone number format')
+
+            # get user preferences and setting
+            settings = getSeetingsByUser()
+            userSettings = settings.get(request, 4).data
+
+            # normalize the phone number to append the country code if not present
+            try:
+                # Normalize the phone number
+                phone_number = normalize_phone_number(phone_number)
+            except ValueError as e:
+                # Return an error response if the phone number is invalid
+                response = HttpResponse(f'Error: {str(e)}')
+                response['Content-Type'] = 'text/plain'
+                return response
+            
+             # Get the user by phone number
+            users = get_user_by_phone(phone_number)
+            # Check if user exists and get the first one
+            if users:
+                user = users.first()
+            else:
+                # User doesn't exist, return an error response
+                response = HttpResponse('User not found')
+                response['Content-Type'] = 'text/html'
                 return response
 
-            phone_number = phone.normalize()
+            # Append the user to the USSD response
+            ussd_handler = USSDVoting(request, userSettings).USSDHandler
+            ussd_response = ussd_handler(text, session_id, phone_number, user)
 
-            ussd_response = USSDHandler(text, session_id, phone_number)
+            # Return the response with content type set to text/html
             response = HttpResponse(ussd_response)
-            response['Content-Type'] = 'text/plain'
-            user = get_user_by_phone(phone_number)
-            settings = get_settings_by_user(user)
-
-            request.session['settings'] = settings
-            request.session['user'] = user
-
+            response['Content-Type'] = 'text/html'
             return response
 
         return self.get_response(request)

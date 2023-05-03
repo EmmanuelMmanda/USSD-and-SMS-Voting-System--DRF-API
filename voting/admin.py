@@ -58,7 +58,7 @@ class ResultsAdmin(admin.ModelAdmin):
     list_filter = ('position__election',)
 
 class SettingsAdmin(admin.ModelAdmin):
-    list_display = ('key', 'value', 'user', 'updated_at')  
+    list_display = ('language','user', 'updated_at')  
 
 
 admin.site.register(Voter, VoterAdmin)
