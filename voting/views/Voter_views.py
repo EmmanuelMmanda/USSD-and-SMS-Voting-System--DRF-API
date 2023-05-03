@@ -26,7 +26,12 @@ class VotersListView(APIView):
 
     def post(self, request, format=None):
         serializer = VoterSerializer(data=request.data)
+
+        
+
+
         if serializer.is_valid():
+
             serializer.save()
             data = {
                 "data": serializer.data,

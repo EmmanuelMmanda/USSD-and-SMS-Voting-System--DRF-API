@@ -35,8 +35,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "ussd.middlewares.USSDMiddleware", 
     "django.middleware.common.CommonMiddleware",
+    "ussd.middlewares.USSDMiddleware", #custom ussd mdlware
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",

@@ -119,7 +119,7 @@ class Results(models.Model):
         verbose_name_plural = "Results"
 
 class Settings(models.Model):
-    language = models.CharField(max_length=100, unique=True)
+    language = models.CharField(max_length=100, default='EN')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
 
