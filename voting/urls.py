@@ -4,7 +4,7 @@ from voting.views import ElectionsListView
 from voting.views import ElectionDetailView
 from voting.views import ElectionPositionsView
 from voting.views import ElectionPositionsDetailView
-from voting.views import CandidateListView
+from voting.views import CandidateListView,get_candidates_by_ids_with_positions
 from voting.views import CandidateDetailView
 from voting.views import VotersListView
 from voting.views import VotersDetailView
@@ -14,7 +14,7 @@ from voting.views import VotesForElectionView
 from voting.views import BallotsListView
 from voting.views import BallotsDetailView
 from voting.views import ResultsListView, GenerateResultsView
-from voting.views import SettingsView, SettingsDetailView,getSeetingsByUser
+from voting.views import SettingsView, SettingsDetailView, getSeetingsByUser
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
@@ -43,6 +43,8 @@ urlpatterns = [
          CandidateListView.as_view(), name='candidates'),
     path('elections/<int:election_id>/candidates/<int:candidate_id>/',
          CandidateDetailView.as_view(), name='candidate-update'),
+    path('elections/<int:election_id>/getCandidatesByIDs/',
+         get_candidates_by_ids_with_positions.as_view(), name='candidates-by-ids'),
 
     # # Voters
     path('voters/', VotersListView.as_view(), name='voter-list'),

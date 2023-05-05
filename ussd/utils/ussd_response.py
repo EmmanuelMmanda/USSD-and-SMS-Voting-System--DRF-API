@@ -46,10 +46,14 @@ class USSDResponseHandler:
 
     def SMSMessage(self):
         if self.lang == 'EN':
-            message = "END Your vote has been casted successfully"
+            message = "Your vote has been casted successfully, Thank you for voting. "
+            message += "You can Access the election results by dialing *384*10102# then option 2 - View Results \n"
+            message += "🗳️ Kudos, ARUSO Voting 2023🗳️ "
             return message
         elif self.lang == 'SW':
-            message = "END Kura yako imepigwa kwa mafanikio"
+            message = "Kura yako imehifadhiwa kikamilifu, Asante kwa kupiga kura. "
+            message += "Unaweza kupata matokeo ya uchaguzi kwa kubonyeza *384*10102# kisha chagua 2 - Angalia matokeo \n"
+            message += "🗳️ Hongera, ARUSO Voting 2023🗳️ "
             return message
 
     def IncorrectPIN(self):
@@ -79,21 +83,28 @@ class USSDResponseHandler:
             return ('END Samahani, umeshapiga kura ! '
                     'Unaweza kuona matokeo tu \n'
                     )
-    
+
     def resultMenu(self, results):
         if self.lang == 'EN':
             menu = f"END Voting Results: \n Name - votes - percentage\n _______________________________\n"
             for result in results:
                 menu += f"{result['candidate_full_name']} - {result['vote_count']} - {round(result['vote_percentage'])}%\n"
             menu += f"_______________________________\n"
-            menu += f"An SMS will be sent to you with the results."
+            menu += f"An SMS will be sent to you with the results. Once the election is complete"
             return menu
-        
+
         elif self.lang == 'SW':
             menu = f"END Matokeo ya Kura: \n Jina - kura - asilimia\n _______________________________\n"
             for result in results:
                 menu += f"{result['candidate_full_name']} - {result['vote_count']} - {round(result['vote_percentage'])}%\n"
             menu += f"_______________________________\n"
-            menu += f"SMS itatumwa kwako na matokeo."
+            menu += f"SMS itatumwa kwako na matokeo. Pindi uchaguzi utakamilika "
             return menu
-        
+
+    def cancelRequestResponse(self):
+        if self.lang == 'EN':
+            return ('END Your Voting request has been cancelled , You may try again later.')
+
+        elif self.lang == 'SW':
+            return ('END Ombi lako limesitishwa, Unaweza kujaribu tena baadae.'
+                    )

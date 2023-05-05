@@ -6,10 +6,14 @@ from voting.models import Position
 
 class CandidateSerializer(serializers.ModelSerializer):
     position = serializers.PrimaryKeyRelatedField(queryset=Position.objects.all())
+    position__title = serializers.CharField(source='position.title', read_only=True)
 
     class Meta:
         model = Candidate
-        fields = ['id', 'first_name', 'last_name', 'manifesto', 'position']
+        fields = ['id', 'first_name', 'last_name', 'manifesto', 'position', 'position__title']
+
+    def get_position(self, obj):
+        return obj.position.title
 
     def create(self, validated_data):
         return Candidate.objects.create(**validated_data)

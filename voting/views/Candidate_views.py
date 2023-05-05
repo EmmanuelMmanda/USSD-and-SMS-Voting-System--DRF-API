@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
 from voting.models import Candidate
 from voting.serializers.CandidateSerializer import CandidateSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
@@ -27,8 +28,21 @@ class CandidateListView(APIView):
         return Response({'data': serializer.errors, 'status': status.HTTP_400_BAD_REQUEST, 'detail': 'Failed to create candidate'})
 
 
-# get a specific candidate based on an election id and a candidate id
+    # get list of all candidates on a list of specific candidates id and their positions candidate idd are query params
+class get_candidates_by_ids_with_positions(APIView):
+    permission_classes = [IsAdminUser | IsAuthenticatedOrReadOnly]
 
+    def get(self, request, election_id):
+        #get query params
+        id1 = request.GET.get('id1')
+        id2 = request.GET.get('id2')
+        id3 = request.GET.get('id3')
+        id4 = request.GET.get('id4')
+        
+        #get candidates with their positions within a specfic election using select_related
+        candidates = Candidate.objects.filter(Q(id__in=[id1, id2, id3, id4]) & Q(position__election__id=election_id)).select_related('position')
+        serializer = CandidateSerializer(candidates, many=True) 
+        return Response({'candidates': serializer.data, 'status': status.HTTP_200_OK, 'detail': 'Partial Candidates retrieved successfully'})
 
 class CandidateDetailView(APIView):
     permission_classes = [IsAdminUser | IsAuthenticatedOrReadOnly]
@@ -66,3 +80,6 @@ class CandidateDetailView(APIView):
         candidate = self.get_object(election_id, candidate_id)
         candidate.delete()
         return Response({'status': status.HTTP_204_NO_CONTENT, 'detail': 'Candidate deleted successfully'})
+
+    
+        

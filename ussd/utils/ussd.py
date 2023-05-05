@@ -10,6 +10,8 @@ from rest_framework.request import Request
 from voting.views.Settings_view import getSeetingsByUser
 from .resultHandller import Results
 
+from .sms import SMS
+
 
 request_factory = RequestFactory()
 request = request_factory.get('/')
@@ -25,6 +27,7 @@ class USSDVoting:
         self.userPrefs = UserPrefs
         self.menu = USSDMenu(self.lang)
         self.response = USSDResponseHandler(self.lang)
+        self.sms = SMS()
 
     def getCandidates(self):
         response = self.candidates.get(request, 1)
@@ -38,9 +41,8 @@ class USSDVoting:
 
         print(f'phonenumber at ussd.py-> {phone_number}')
 
-        text_array = []
-        # Split USSD input text by asterisk        
-        text_array = text.split('*')
+        # Split USSD input text by asterisk       
+        text_array = text.split('*') 
         # Get the length of the text array
         level = len(text_array)
         response = ''
@@ -65,34 +67,40 @@ class USSDVoting:
                         response = self.menu.VoteMenu(
                             position, 2, self.getCandidates())
                 elif level == 3:
-                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 3]:
+                    if not text_array[2].isdigit() or int(text_array[2]) not in [3,4]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Secretary' if self.menu.lang == 'EN' else 'Katibu'
                         response = self.menu.VoteMenu(
                             position, 3, self.getCandidates())
                 elif level == 4:
-                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 3, 4]:
+                    if not text_array[3].isdigit() or int(text_array[3]) not in [5,6]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Treasurer' if self.menu.lang == 'EN' else 'Mweka Hazina'
                         response = self.menu.VoteMenu(
                             position, 4, self.getCandidates())
                 elif level == 5:
-                    if not all(map(str.isdigit, text_array[1:])):
+                    if not text_array[4].isdigit() or int(text_array[4]) not in [7,8]:
                         response = self.response.invalid_input()
                     else:
-                        response = self.menu.BallotMenu(text_array)
+                        response = self.menu.BallotMenu(request,text_array)
                 elif level == 6:
                     last_text = text_array[-1]
                     if last_text == '1':
                         try:
-                            self.cast_vote(phone_number, text_array[1:])
+                            res = self.cast_vote(phone_number, text_array[1:])
+                            if res:
+                                try:
+                                    self.sms.send([phone_number], self.response.SMSMessage())
+                                except Exception as e:
+                                    response = self.response.Error() + str(e)
                             response = self.response.VoteCastSuccess()
-                        except:
-                            response = self.response.VoteCastError()
+                        except Exception as e:
+                            response = self.response.VoteCastError() + str(e)
                     elif last_text == '2':
-                        response = self.menu.MainMenu()
+                        print('user pressed 2')
+                        response = self.response.cancelRequestResponse()
                     else:
                         response = self.response.invalid_input()
                 else:
@@ -123,6 +131,7 @@ class USSDVoting:
                 response = self.response.Error() + str(e)
             return (response)
         else:
+            print('invalid input')
             response = self.response.invalid_input()
             return (response)
 
@@ -133,7 +142,7 @@ class USSDVoting:
 
     def cast_vote(self, phone_number, candidate_number):
         # send a post request to the API to cast the vote based on our Voting app
-        return None
+        return True
 
     def view_results(self):
         results = Results()

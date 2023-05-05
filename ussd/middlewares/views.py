@@ -61,7 +61,6 @@ class USSDMiddleware:
              # Get the user by phone number
             user = get_user_by_phone(phone_number)
 
-            print(user)
             # Check if user exists and get the first one
             if not user:
                 # User doesn't exist, return an error response
@@ -75,7 +74,8 @@ class USSDMiddleware:
 
             # Append the user to the USSD response
             ussd_handler = USSDVoting(request, userSettings).USSDHandler
-            ussd_response = ussd_handler(text, session_id, phone_number, user)
+            ussd_response = ussd_handler(
+                text, session_id, phone_number, user)
 
             # Return the response with content type set to text/html
             response = HttpResponse(ussd_response)
