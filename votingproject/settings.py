@@ -19,10 +19,6 @@ DEBUG = os.getenv('DJANGO_DEBUG')
 ALLOWED_HOSTS = ['*']
 
 
-#Africas talking  api keys
-AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME')
-AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY')
-
 # Application definition
 
 INSTALLED_APPS = [
