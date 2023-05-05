@@ -35,16 +35,25 @@ class USSDVoting:
         return candidates_data
 
     def USSDHandler(self, text, session_id, phone_number, user):
+        print(f'USSDHandler-> {text}')
         # Check if the voter is registered
         is_registered = self.voter.is_registered(phone_number)
         has_voted = False
 
         print(f'phonenumber at ussd.py-> {phone_number}')
 
-        # Split USSD input text by asterisk       
-        text_array = text.split('*') 
+        # check if go back or main menu is selected
+        # self.go_back_main_menu(text)
+
+        # print(f'is_registered-> {is_registered}')
+        # self.go_back(text)
+
+        # Split USSD input text by asterisk
+        text_array = text.split('*')
+
         # Get the length of the text array
         level = len(text_array)
+        print(f'level-> {level}')
         response = ''
 
         # Handle USSD input based on user registration status and text input
@@ -60,31 +69,31 @@ class USSDVoting:
                     response = self.menu.VoteMenu(
                         position, 1, self.getCandidates())
                 elif level == 2:
-                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2]:
+                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Vice Chairperson' if self.menu.lang == 'EN' else 'Makamu Mwenyekiti'
                         response = self.menu.VoteMenu(
                             position, 2, self.getCandidates())
                 elif level == 3:
-                    if not text_array[2].isdigit() or int(text_array[2]) not in [3,4]:
+                    if not text_array[2].isdigit() or int(text_array[2]) not in [3, 4, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Secretary' if self.menu.lang == 'EN' else 'Katibu'
                         response = self.menu.VoteMenu(
                             position, 3, self.getCandidates())
                 elif level == 4:
-                    if not text_array[3].isdigit() or int(text_array[3]) not in [5,6]:
+                    if not text_array[3].isdigit() or int(text_array[3]) not in [5, 6, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Treasurer' if self.menu.lang == 'EN' else 'Mweka Hazina'
                         response = self.menu.VoteMenu(
                             position, 4, self.getCandidates())
                 elif level == 5:
-                    if not text_array[4].isdigit() or int(text_array[4]) not in [7,8]:
+                    if not text_array[4].isdigit() or int(text_array[4]) not in [7, 8, 98, 99]:
                         response = self.response.invalid_input()
                     else:
-                        response = self.menu.BallotMenu(request,text_array)
+                        response = self.menu.BallotMenu(request, text_array)
                 elif level == 6:
                     last_text = text_array[-1]
                     if last_text == '1':
@@ -92,7 +101,8 @@ class USSDVoting:
                             res = self.cast_vote(phone_number, text_array[1:])
                             if res:
                                 try:
-                                    self.sms.send([phone_number], self.response.SMSMessage())
+                                    self.sms.send(
+                                        [phone_number], self.response.SMSMessage())
                                 except Exception as e:
                                     response = self.response.Error() + str(e)
                             response = self.response.VoteCastSuccess()
@@ -117,7 +127,6 @@ class USSDVoting:
 
         elif text_array[0] == '3':
             # try change language
-
             currentLang = self.lang
             if currentLang == 'EN':
                 self.lang = 'SW'
@@ -125,7 +134,7 @@ class USSDVoting:
                 self.lang = 'EN'
             try:
                 self.settingDetail.change_language(request,
-                    self.userPrefs[0]['id'], self.lang)
+                                                   self.userPrefs[0]['id'], self.lang)
                 response = self.menu.changeLanguageSuccess()
             except Exception as e:
                 response = self.response.Error() + str(e)
@@ -150,4 +159,25 @@ class USSDVoting:
 
         return self.response.resultMenu(ArusoResults)
 
-    
+    def go_back_main_menu(self, text):
+        print(f'go_back_main_menu-> {text}')
+        # remove the existing text and text array ib our session
+        exploded_text = text.split('*')
+        if "99" in exploded_text is not False:
+            first_index = exploded_text.index(
+                exploded_text) if "99" in exploded_text else -1
+            exploded_text = exploded_text[first_index +
+                                          1:] if first_index != -1 else exploded_text
+            text = '*'.join(exploded_text)
+
+    def go_back(self, text):
+        print(f'go_back-> {text}')
+        # remove the existing text and text array ib our session
+        exploded_text = text.split('*')
+        if "98" in exploded_text is not False:
+            first_index = exploded_text.index(
+                exploded_text) if "98" in exploded_text else -1
+            exploded_text = exploded_text[first_index +
+                                          1:] if first_index != -1 else exploded_text
+            text = '*'.join(exploded_text)
+        return text

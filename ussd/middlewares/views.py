@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from ..utils import USSDVoting
 from voting.views import getSeetingsByUser
+from ussd.utils.ussd_response import USSDResponseHandler
+
 
 
 def get_user_by_phone(phone_number):
@@ -45,6 +47,8 @@ class USSDMiddleware:
             phone_number = request.POST.get('phoneNumber')
             text = request.POST.get('text')
 
+            print(f'session_id->{session_id}')
+
             # check if the parameteres are empty and return a get response
             if session_id == None or phone_number == None or text == None:
                 return self.get_response(request)
@@ -64,7 +68,7 @@ class USSDMiddleware:
             # Check if user exists and get the first one
             if not user:
                 # User doesn't exist, return an error response
-                response = HttpResponse('User not found')
+                response = HttpResponse('END Oops! You are not allowed to participate in electios, Please contact the administrator to register you.')
                 response['Content-Type'] = 'text/html'
                 return response
             print(f'my user->{user.id}')
@@ -76,10 +80,13 @@ class USSDMiddleware:
             ussd_handler = USSDVoting(request, userSettings).USSDHandler
             ussd_response = ussd_handler(
                 text, session_id, phone_number, user)
+            
+            print(f'ussd_response->{ussd_response}')
 
             # Return the response with content type set to text/html
             response = HttpResponse(ussd_response)
             response['Content-Type'] = 'text/html'
             return response
+
 
         return self.get_response(request)
