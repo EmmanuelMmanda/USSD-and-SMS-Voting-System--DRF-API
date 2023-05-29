@@ -103,7 +103,8 @@ class USSDMenu:
 
         # create a formatted string for each candidate in the form "Candidate A - positionID"
         result = [
-            f"{c['id']}. {c['first_name']} {c['==']} " for c in filtered_candidates]
+            f"{c['id']}. {c['first_name']} {c['last_name']}" for c in filtered_candidates]
+        
 
         # create a menu from the result
         menu = ''
