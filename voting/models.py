@@ -75,35 +75,20 @@ class Candidate(models.Model):
         verbose_name_plural = "Candidates"
 
 
-# class Ballot(models.Model):
-#     voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     election = models.ForeignKey(Election, null=True, on_delete=models.CASCADE)
-#     unique_together = ('voter', 'election')
-
-#     def __str__(self):
-#         return f"{self.voter} ({self.voter.university_id})"
-    
-
-#     class Meta:
-#         verbose_name = "Ballot"
-#         verbose_name_plural = "Ballots"
-
-
 class Vote(models.Model):
     voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
-    # ballot = models.ForeignKey(Ballot, on_delete=models.CASCADE)
     Position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, null=True)
     time_cast = models.DateTimeField(default=timezone.now)
     vote_value = models.IntegerField(default=1, editable=False)
 
+    UNIQUE_TOGETHER = ('voter', 'Position', 'candidate')
+
     class Meta:
         unique_together = ('voter','Position', 'candidate')
 
     def __str__(self):
-        return f"{self.voter} voted for {self.candidate} in {self.ballot}"
+        return f"{self.voter} voted for {self.candidate}"
     
 class Results(models.Model):
     election = models.ForeignKey(Election, on_delete=models.CASCADE)

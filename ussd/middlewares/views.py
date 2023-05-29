@@ -47,6 +47,9 @@ class USSDMiddleware:
             phone_number = request.POST.get('phoneNumber')
             text = request.POST.get('text')
 
+            #generate a base url
+            BASE_URL = request.build_absolute_uri('/')
+
 
             # check if the parameteres are empty and return a get response
             if session_id == None or phone_number == None or text == None:
@@ -70,13 +73,12 @@ class USSDMiddleware:
                 response = HttpResponse('END Oops! You are not allowed to participate in electios, Please contact the administrator to register you.')
                 response['Content-Type'] = 'text/html'
                 return response
-            print(f'my user->{user.id}')
             # get user preferences and setting
             settings = getSeetingsByUser()
             userSettings = settings.get(request, user.id).data
 
             # Append the user to the USSD response
-            ussd_handler = USSDVoting(request, userSettings).USSDHandler
+            ussd_handler = USSDVoting(request, userSettings,BASE_URL).USSDHandler
             ussd_response = ussd_handler(
                 text, session_id, phone_number, user)
             

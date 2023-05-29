@@ -1,4 +1,6 @@
-from django.test import RequestFactory
+import json
+from django.urls import reverse
+import requests
 from voting.views import VotersDetailView
 from voting.views import CandidateListView
 from voting.views import ElectionPositionsView
@@ -6,31 +8,33 @@ from voting.views import SettingsDetailView
 from ussd.utils.Menus import USSDMenu
 from ussd.utils.ussd_response import USSDResponseHandler
 from rest_framework.request import Request
+from rest_framework.authtoken.models import Token
+
 
 from voting.views.Settings_view import getSeetingsByUser
+from voting.views.Vote_views import VotesListView
 from .resultHandller import Results
 
 from .sms import SMS
 
 
-request_factory = RequestFactory()
-request = request_factory.get('/')
-
-
 class USSDVoting:
-    def __init__(self, request, UserPrefs):
+    def __init__(self, request, UserPrefs, BASE_URL):
         self.voter = VotersDetailView()
         self.candidates = CandidateListView()
         self.positions = ElectionPositionsView()
+        self.vote = VotesListView()
         self.lang = UserPrefs[0]['language'] if UserPrefs else 'EN'
         self.settingDetail = SettingsDetailView()
         self.userPrefs = UserPrefs
         self.menu = USSDMenu(self.lang)
         self.response = USSDResponseHandler(self.lang)
         self.sms = SMS()
+        self.request = request
+        self.BASE_URL = BASE_URL
 
-    def getCandidates(self):
-        response = self.candidates.get(request, 1)
+    def getCandidates(self, request):
+        response = self.candidates.get(self.request, 1)
         candidates_data = response.data
         return candidates_data
 
@@ -38,16 +42,10 @@ class USSDVoting:
         print(f'USSDHandler-> {text}')
         # Check if the voter is registered
         is_registered = self.voter.is_registered(phone_number)
-        has_voted = False
+        # Check if the voter has voted
+        has_voted = self.voter.has_voted(phone_number)
 
         print(f'phonenumber at ussd.py-> {phone_number}')
-
-        # check if go back or main menu is selected
-        # self.go_back_main_menu(text)
-
-        # print(f'is_registered-> {is_registered}')
-        # self.go_back(text)
-
         # Split USSD input text by asterisk
         text_array = text.split('*')
 
@@ -67,33 +65,20 @@ class USSDVoting:
                 if level == 1:
                     position = 'Chairperson' if self.menu.lang == 'EN' else 'Mwenyekiti'
                     response = self.menu.VoteMenu(
-                        position, 1, self.getCandidates())
+                        position, 1, self.getCandidates(self.request))
                 elif level == 2:
-                    if not text_array[1].isdigit() or int(text_array[1]) not in [1,2,3, 98, 99]:
+                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 3, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Vice Chairperson' if self.menu.lang == 'EN' else 'Makamu Mwenyekiti'
                         response = self.menu.VoteMenu(
-                            position, 2, self.getCandidates())
-                # elif level == 3:
-                #     if not text_array[2].isdigit() or int(text_array[2]) not in [4, 5, 6,98, 99]:
-                #         response = self.response.invalid_input()
-                #     else:
-                #         position = 'Secretary' if self.menu.lang == 'EN' else 'Katibu'
-                #         response = self.menu.VoteMenu(
-                #             position, 3, self.getCandidates())
-                # elif level == 4:
-                #     if not text_array[3].isdigit() or int(text_array[3]) not in [5, 6, 98, 99]:
-                #         response = self.response.invalid_input()
-                #     else:
-                #         position = 'Treasurer' if self.menu.lang == 'EN' else 'Mweka Hazina'
-                #         response = self.menu.VoteMenu(
-                #             position, 4, self.getCandidates())
+                            position, 2, self.getCandidates(self.request))
                 elif level == 3:
-                    if not text_array[2].isdigit() or int(text_array[2]) not in [4, 5, 6,98, 99]:
+                    if not text_array[2].isdigit() or int(text_array[2]) not in [4, 5, 6, 98, 99]:
                         response = self.response.invalid_input()
                     else:
-                        response = self.menu.BallotMenu(request, text_array)
+                        response = self.menu.BallotMenu(
+                            self.request, text_array)
                 elif level == 4:
                     last_text = text_array[-1]
                     if last_text == '1':
@@ -133,7 +118,7 @@ class USSDVoting:
             else:
                 self.lang = 'EN'
             try:
-                self.settingDetail.change_language(request,
+                self.settingDetail.change_language(self.request,
                                                    self.userPrefs[0]['id'], self.lang)
                 response = self.menu.changeLanguageSuccess()
             except Exception as e:
@@ -144,19 +129,37 @@ class USSDVoting:
             response = self.response.invalid_input()
             return (response)
 
-        # Check for invalid input
-        if level > 6:
-            response = self.response.invalid_input()
-        return response
+    def cast_vote(self, phone_number, data):
+        # Get the voter's details
+        voter = self.voter.get_voter(phone_number)
+        print(f'voter-> {voter.user}')
+        token = Token.objects.get(user=voter.user)
 
-    def cast_vote(self, phone_number, candidate_number):
-        # send a post request to the API to cast the vote based on our Voting app
-        
-        return True
+        headers = {'Content-Type': 'application/json',
+                   'Authorization': f'Token {token}'}
+
+        votes = [
+            {
+                "voter": voter.id,
+                "Position": 1,
+                "candidate": data[0]
+            },
+            {
+                "voter": voter.id,
+                "Position": 2,
+                "candidate": data[1]
+            }
+        ]
+        url = f'{self.BASE_URL}votes/'
+        json_data = json.dumps(votes)
+        voting = requests.post(url, data=json_data, headers=headers)
+        if voting.status_code == 201:
+            return True
+        return False
 
     def view_results(self):
         results = Results()
-        ArusoResults = results.get_results(1, request)
+        ArusoResults = results.get_results(1, self.request)
 
         return self.response.resultMenu(ArusoResults)
 

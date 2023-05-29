@@ -136,5 +136,25 @@ class VotersDetailView(APIView):
         except Voter.DoesNotExist:
             print("voter does not exist")
             return False
+        
+    def get_voter(self, phone_number):
+        try:
+            voter = Voter.objects.get(phone_number=phone_number)
+            if voter:
+                return voter
+            else:
+                return None
+        except Voter.DoesNotExist:
+            print("voter does not exist")
+            return None
 
-
+    def has_voted(self, phone_number):
+        try:
+            voter = Voter.objects.get(phone_number=phone_number)
+            if voter.has_vote:
+                return True
+            else:
+                return False
+        except Voter.DoesNotExist:
+            print("voter does not exist")
+            return False

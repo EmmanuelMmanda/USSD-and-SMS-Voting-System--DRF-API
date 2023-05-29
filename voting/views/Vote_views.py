@@ -1,3 +1,4 @@
+import json
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
@@ -10,22 +11,32 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 class VotesListView(APIView):
     permission_classes = [IsAdminUser]
-
     def get(self, request, format=None):
         votes = Vote.objects.all()
         serializer = VoteSerializer(votes, many=True)
         return Response({'data': serializer.data, 'message': 'Votes retrieved successfully.', 'status': status.HTTP_200_OK})
 
-    def post(self, request, format=None):
-        serializer = VoteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'data': serializer.data, 'message': 'Vote created successfully.', 'status': status.HTTP_201_CREATED})
-        return Response({'data': serializer.errors, 'message': 'Error creating vote.', 'status': status.HTTP_400_BAD_REQUEST})
-
-
-class VotesDetailView(APIView):
     permission_classes = [IsAdminUser | IsAuthenticated]
+    def post(self, request, format=None):
+        print(f'vote-> {request.data}')
+        for vote in request.data:
+            try:
+                serializer = VoteSerializer(data=vote)
+            except Exception as e:
+                print(f'error-> {e}')
+            if serializer.is_valid():
+                #set voter status to voted
+                voter = serializer.validated_data['voter']
+                voter.has_vote = True
+                voter.save()
+                serializer.save()
+            
+            else:
+                return Response({'error': serializer.errors, 'message': 'Error creating vote.', 'status': status.HTTP_400_BAD_REQUEST})
+        return Response({'message': 'Votes created successfully.', 'status': status.HTTP_201_CREATED})
+    
+class VotesDetailView(APIView):
+    permission_classes = [IsAdminUser ]
 
     def get_object(self, pk):
         try:
