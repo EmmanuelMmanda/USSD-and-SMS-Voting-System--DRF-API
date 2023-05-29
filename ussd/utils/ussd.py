@@ -69,32 +69,32 @@ class USSDVoting:
                     response = self.menu.VoteMenu(
                         position, 1, self.getCandidates())
                 elif level == 2:
-                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 98, 99]:
+                    if not text_array[1].isdigit() or int(text_array[1]) not in [1,2,3, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Vice Chairperson' if self.menu.lang == 'EN' else 'Makamu Mwenyekiti'
                         response = self.menu.VoteMenu(
                             position, 2, self.getCandidates())
+                # elif level == 3:
+                #     if not text_array[2].isdigit() or int(text_array[2]) not in [4, 5, 6,98, 99]:
+                #         response = self.response.invalid_input()
+                #     else:
+                #         position = 'Secretary' if self.menu.lang == 'EN' else 'Katibu'
+                #         response = self.menu.VoteMenu(
+                #             position, 3, self.getCandidates())
+                # elif level == 4:
+                #     if not text_array[3].isdigit() or int(text_array[3]) not in [5, 6, 98, 99]:
+                #         response = self.response.invalid_input()
+                #     else:
+                #         position = 'Treasurer' if self.menu.lang == 'EN' else 'Mweka Hazina'
+                #         response = self.menu.VoteMenu(
+                #             position, 4, self.getCandidates())
                 elif level == 3:
-                    if not text_array[2].isdigit() or int(text_array[2]) not in [3, 4, 98, 99]:
-                        response = self.response.invalid_input()
-                    else:
-                        position = 'Secretary' if self.menu.lang == 'EN' else 'Katibu'
-                        response = self.menu.VoteMenu(
-                            position, 3, self.getCandidates())
-                elif level == 4:
-                    if not text_array[3].isdigit() or int(text_array[3]) not in [5, 6, 98, 99]:
-                        response = self.response.invalid_input()
-                    else:
-                        position = 'Treasurer' if self.menu.lang == 'EN' else 'Mweka Hazina'
-                        response = self.menu.VoteMenu(
-                            position, 4, self.getCandidates())
-                elif level == 5:
-                    if not text_array[4].isdigit() or int(text_array[4]) not in [7, 8, 98, 99]:
+                    if not text_array[2].isdigit() or int(text_array[2]) not in [4, 5, 6,98, 99]:
                         response = self.response.invalid_input()
                     else:
                         response = self.menu.BallotMenu(request, text_array)
-                elif level == 6:
+                elif level == 4:
                     last_text = text_array[-1]
                     if last_text == '1':
                         try:
@@ -151,6 +151,7 @@ class USSDVoting:
 
     def cast_vote(self, phone_number, candidate_number):
         # send a post request to the API to cast the vote based on our Voting app
+        
         return True
 
     def view_results(self):

@@ -43,16 +43,12 @@ class USSDMenu:
         # map throug the text array and return the items and add them to a request query params
         id1 = text_array[1]
         id2 = text_array[2]
-        id3 = text_array[3]
-        id4 = text_array[4]
 
         # Create a new QueryDict with the updated query parameters
         query_params = QueryDict(mutable=True)
         query_params.update({
             'id1': id1,
             'id2': id2,
-            'id3': id3,
-            'id4': id4,
         })
 
         # Replace the existing query parameters in the request with the new QueryDict
@@ -74,14 +70,14 @@ class USSDMenu:
 
         if self.lang == 'EN':
             return self.get_menu('You have selected \n '
-                                 '____________________________'
+                                 '____________________________\n'
                                  f'{formatted_string} \n'
                                  'Please select \n'
                                  '1. Confirm \n'
                                  '2. Cancel \n')
         elif self.lang == 'SW':
             return self.get_menu('Umechagua - \n '
-                                 '____________________________'
+                                 '____________________________\n'
                                  f'{formatted_string} \n'
                                  'Tafadhali chagua \n'
                                  '1. Thibitisha \n'

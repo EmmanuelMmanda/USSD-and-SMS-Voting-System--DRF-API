@@ -34,8 +34,10 @@ class Election(models.Model):
     description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    Voter = models.ManyToManyField(
-        Voter, through='Ballot', related_name='voters')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=False)
+    voters = models.ManyToManyField(Voter, blank=True)
 
     def __str__(self):
         return self.title
@@ -73,25 +75,25 @@ class Candidate(models.Model):
         verbose_name_plural = "Candidates"
 
 
-class Ballot(models.Model):
-    voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    election = models.ForeignKey(Election, null=True, on_delete=models.CASCADE)
-    unique_together = ('voter', 'election')
+# class Ballot(models.Model):
+#     voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     election = models.ForeignKey(Election, null=True, on_delete=models.CASCADE)
+#     unique_together = ('voter', 'election')
 
-    def __str__(self):
-        return f"{self.voter} ({self.voter.university_id})"
+#     def __str__(self):
+#         return f"{self.voter} ({self.voter.university_id})"
     
 
-    class Meta:
-        verbose_name = "Ballot"
-        verbose_name_plural = "Ballots"
+#     class Meta:
+#         verbose_name = "Ballot"
+#         verbose_name_plural = "Ballots"
 
 
 class Vote(models.Model):
     voter = models.ForeignKey(Voter, on_delete=models.CASCADE)
-    ballot = models.ForeignKey(Ballot, on_delete=models.CASCADE)
+    # ballot = models.ForeignKey(Ballot, on_delete=models.CASCADE)
     Position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, null=True)
     time_cast = models.DateTimeField(default=timezone.now)

@@ -47,7 +47,6 @@ class USSDMiddleware:
             phone_number = request.POST.get('phoneNumber')
             text = request.POST.get('text')
 
-            print(f'session_id->{session_id}')
 
             # check if the parameteres are empty and return a get response
             if session_id == None or phone_number == None or text == None:

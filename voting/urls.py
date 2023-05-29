@@ -11,8 +11,6 @@ from voting.views import VotersDetailView
 from voting.views import VotesListView
 from voting.views import VotesDetailView
 from voting.views import VotesForElectionView
-from voting.views import BallotsListView
-from voting.views import BallotsDetailView
 from voting.views import ResultsListView, GenerateResultsView
 from voting.views import SettingsView, SettingsDetailView, getSeetingsByUser
 
@@ -54,10 +52,6 @@ urlpatterns = [
     path('votes/', VotesListView.as_view(), name='vote-create'),
     path('votes/<int:vote_id>/', VotesDetailView.as_view(), name='vote-update'),
 
-    # Ballots
-    path('ballots/', BallotsListView.as_view(), name='ballot-list'),
-    path('ballots/<int:ballot_id>/',
-         BallotsDetailView.as_view(), name='ballot-update'),
 
     # setting path
     path('settings/', SettingsView.as_view(), name='setting'),
