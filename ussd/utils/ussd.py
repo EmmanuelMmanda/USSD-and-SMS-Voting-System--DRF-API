@@ -111,6 +111,7 @@ class USSDVoting:
             return (response)
 
         elif text_array[0] == '3':
+            print('changing language ...')
             # try change language
             currentLang = self.lang
             if currentLang == 'EN':
@@ -118,6 +119,7 @@ class USSDVoting:
             else:
                 self.lang = 'EN'
             try:
+                print(f'currentLang-> {currentLang} -usrpresf-> {self.userPrefs}')
                 self.settingDetail.change_language(self.request,
                                                    self.userPrefs[0]['id'], self.lang)
                 response = self.menu.changeLanguageSuccess()

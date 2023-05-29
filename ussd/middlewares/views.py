@@ -1,10 +1,11 @@
 import re
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from ..utils import USSDVoting
-from voting.views import getSeetingsByUser
-from ussd.utils.ussd_response import USSDResponseHandler
 
+from voting.views.Settings_view import SettingsDetailView
+from ..utils import USSDVoting
+from voting.views import getSeetingsByUser, SettingsView
+from ussd.utils.ussd_response import USSDResponseHandler
 
 
 def get_user_by_phone(phone_number):
@@ -47,9 +48,8 @@ class USSDMiddleware:
             phone_number = request.POST.get('phoneNumber')
             text = request.POST.get('text')
 
-            #generate a base url
+            # generate a base url
             BASE_URL = request.build_absolute_uri('/')
-
 
             # check if the parameteres are empty and return a get response
             if session_id == None or phone_number == None or text == None:
@@ -66,28 +66,37 @@ class USSDMiddleware:
 
              # Get the user by phone number
             user = get_user_by_phone(phone_number)
+            # create a new language setings for the user
 
             # Check if user exists and get the first one
             if not user:
                 # User doesn't exist, return an error response
-                response = HttpResponse('END Oops! You are not allowed to participate in electios, Please contact the administrator to register you.')
+                response = HttpResponse(
+                    'END Oops! You are not allowed to participate in electios, Please contact the administrator to register you.')
                 response['Content-Type'] = 'text/html'
                 return response
             # get user preferences and setting
             settings = getSeetingsByUser()
             userSettings = settings.get(request, user.id).data
 
+            # check if no alnguage settings for the user and create one
+            if not userSettings:
+                # create a new language setings for the user
+                SettingsDetailView().addDefaultLang(request, user.id)
+                # get user preferences and setting
+                userSettings = settings.get(request, user.id).data
+
             # Append the user to the USSD response
-            ussd_handler = USSDVoting(request, userSettings,BASE_URL).USSDHandler
+            ussd_handler = USSDVoting(
+                request, userSettings, BASE_URL).USSDHandler
             ussd_response = ussd_handler(
                 text, session_id, phone_number, user)
-            
+
             print(f'ussd_response->{ussd_response}')
 
             # Return the response with content type set to text/html
             response = HttpResponse(ussd_response)
             response['Content-Type'] = 'text/html'
             return response
-
 
         return self.get_response(request)
