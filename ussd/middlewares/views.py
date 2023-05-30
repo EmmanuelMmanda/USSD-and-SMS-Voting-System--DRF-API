@@ -1,6 +1,7 @@
 import re
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from ussd.utils.sms import SMS
 
 from voting.views.Settings_view import SettingsDetailView
 from ..utils import USSDVoting
@@ -45,19 +46,19 @@ class USSDMiddleware:
         if request.method == 'POST':
             # Get the parameters from the request
             session_id = request.POST.get('sessionId')
-            phone_number = request.POST.get('phoneNumber')
+            init_phone_number = request.POST.get('phoneNumber')
             text = request.POST.get('text')
 
             # generate a base url
             BASE_URL = request.build_absolute_uri('/')
 
             # check if the parameteres are empty and return a get response
-            if session_id == None or phone_number == None or text == None:
+            if session_id == None or init_phone_number == None or text == None:
                 return self.get_response(request)
             # normalize the phone number to append the country code if not present
             try:
                 # Normalize the phone number
-                phone_number = normalize_phone_number(phone_number)
+                phone_number = normalize_phone_number(init_phone_number)
             except ValueError as e:
                 # Return an error response if the phone number is invalid
                 response = HttpResponse(f'Error: {str(e)}')
@@ -72,8 +73,9 @@ class USSDMiddleware:
             if not user:
                 # User doesn't exist, return an error response
                 response = HttpResponse(
-                    'END Oops! You are not allowed to participate in electios, Please contact the administrator to register you.')
+                    'END Oops! You are not allowed to participate in ARUSO election, Please contact the administrator to register you.')
                 response['Content-Type'] = 'text/html'
+                SMS().send([init_phone_number], 'Oops! You are not allowed to participate in ARUSO electio, Please contact the administrator to register you.')
                 return response
             # get user preferences and setting
             settings = getSeetingsByUser()

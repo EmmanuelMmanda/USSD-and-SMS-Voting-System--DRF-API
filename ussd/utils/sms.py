@@ -19,7 +19,8 @@ class SMS():
     def send(self, recepients, message):
         #check if reipirnts phonenumbers have the 255 country code if not append it 
         #iterate trhought therecepients list and check if the first three characters are 255
-        #if not append 255 to the phone number
+        #if not append it 
+        print(recepients)
 
         to_be_sent_recepients = []
         for recepient in recepients:

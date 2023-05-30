@@ -82,17 +82,15 @@ class USSDVoting:
                 elif level == 4:
                     last_text = text_array[-1]
                     if last_text == '1':
-                        try:
-                            res = self.cast_vote(phone_number, text_array[1:])
-                            if res:
-                                try:
-                                    self.sms.send(
+                        res = self.cast_vote(phone_number, text_array[1:])
+                        print(f'res-> {res}')
+                        if res:
+                            print(f'sending sms ...{phone_number}')
+                            self.sms.send(
                                         [phone_number], self.response.SMSMessage())
-                                except Exception as e:
-                                    response = self.response.Error() + str(e)
                             response = self.response.VoteCastSuccess()
-                        except Exception as e:
-                            response = self.response.VoteCastError() + str(e)
+                        else:
+                            response = self.response.VoteCastError()
                     elif last_text == '2':
                         print('user pressed 2')
                         response = self.response.cancelRequestResponse()
@@ -155,7 +153,7 @@ class USSDVoting:
         url = f'{self.BASE_URL}votes/'
         json_data = json.dumps(votes)
         voting = requests.post(url, data=json_data, headers=headers)
-        if voting.status_code == 201:
+        if voting.status_code == 201 or voting.status_code == 200:
             return True
         return False
 
