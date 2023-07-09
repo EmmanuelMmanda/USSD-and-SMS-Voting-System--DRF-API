@@ -52,7 +52,8 @@ def update_results(sender, instance, **kwargs):
 @receiver(post_save, sender=Election)
 def check_election_status(sender, instance, **kwargs):
     if instance.completed:
-        result_sms = "🎉Results are out:\n🎉"
+        result_sms = "🎉ARUSO Voting 2023 \n🎉"
+        result_sms += "Results are out:\n"
         positions = Position.objects.all()
 
         for position in positions:
