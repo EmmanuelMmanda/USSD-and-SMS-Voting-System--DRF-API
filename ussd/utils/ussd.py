@@ -9,12 +9,9 @@ from ussd.utils.Menus import USSDMenu
 from ussd.utils.ussd_response import USSDResponseHandler
 from rest_framework.request import Request
 from rest_framework.authtoken.models import Token
-
-
 from voting.views.Settings_view import getSeetingsByUser
 from voting.views.Vote_views import VotesListView
 from .resultHandller import Results
-
 from .sms import SMS
 
 
@@ -67,14 +64,14 @@ class USSDVoting:
                     response = self.menu.VoteMenu(
                         position, 1, self.getCandidates(self.request))
                 elif level == 2:
-                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 3, 98, 99]:
+                    if not text_array[1].isdigit() or int(text_array[1]) not in [1, 2, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         position = 'Vice Chairperson' if self.menu.lang == 'EN' else 'Makamu Mwenyekiti'
                         response = self.menu.VoteMenu(
                             position, 2, self.getCandidates(self.request))
                 elif level == 3:
-                    if not text_array[2].isdigit() or int(text_array[2]) not in [4, 5, 6, 98, 99]:
+                    if not text_array[2].isdigit() or int(text_array[2]) not in [3,4, 98, 99]:
                         response = self.response.invalid_input()
                     else:
                         response = self.menu.BallotMenu(
@@ -83,7 +80,6 @@ class USSDVoting:
                     last_text = text_array[-1]
                     if last_text == '1':
                         res = self.cast_vote(phone_number, text_array[1:])
-                        print(f'res-> {res}')
                         if res:
                             print(f'sending sms ...{phone_number}')
                             self.sms.send(

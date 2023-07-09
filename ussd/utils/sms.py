@@ -4,10 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize Africa's Talking
-africastalking.initialize(
-    username= "sandbox",
-    api_key= "ec8f9aff4419b6a3306fc3bf15b1c8c6a52a870f37f3e6adfa42d0624474fb9f"
-)
+username = os.getenv('SANDBOX_USER')
+api_key = os.getenv('DEV_API_KEY')
+africastalking.initialize(username, api_key)   
 
 sms = africastalking.SMS
 
@@ -33,7 +32,7 @@ class SMS():
         # Set your message
         message = message
         # Set your shortCode or senderId
-        sender = "ARUSO VOTING"
+        sender = os.getenv('GATEWAY_SENDER_ID')
 
         try:
             response = sms.send(message, recipients, sender)

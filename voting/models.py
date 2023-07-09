@@ -36,7 +36,8 @@ class Election(models.Model):
     end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    completed= models.BooleanField(default=False)
     voters = models.ManyToManyField(Voter, blank=True)
 
     def __str__(self):
