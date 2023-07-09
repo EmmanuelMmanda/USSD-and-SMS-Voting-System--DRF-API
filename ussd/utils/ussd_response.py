@@ -47,12 +47,12 @@ class USSDResponseHandler:
     def SMSMessage(self):
         if self.lang == 'EN':
             message = "Your vote has been casted successfully, Thank you for voting. "
-            message += "You can Access the election results by dialing *384*10102# then option 2 - View Results \n"
+            message += "Full election results will be sent to you when the election is completed \n"
             message += "🗳️ Kudos, ARUSO Voting 2023🗳️ "
             return message
         elif self.lang == 'SW':
             message = "Kura yako imehifadhiwa kikamilifu, Asante kwa kupiga kura. "
-            message += "Unaweza kupata matokeo ya uchaguzi kwa kubonyeza *384*10102# kisha chagua 2 - Angalia matokeo \n"
+            message += "Matokeo ya uchaguzi yatatumwa kwako pindi uchaguzi utakapo kamilika \n"
             message += "🗳️ Hongera, ARUSO Voting 2023🗳️ "
             return message
 

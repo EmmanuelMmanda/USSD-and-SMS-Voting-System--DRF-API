@@ -72,7 +72,7 @@ def check_election_status(sender, instance, **kwargs):
                     highest_vote_candidate = candidate
 
             if highest_vote_candidate is not None:
-                result_sms += f" {position.title.capitalize()} - {highest_vote_candidate.first_name} {highest_vote_candidate.last_name} ({highest_vote_percentage}%),\n"
+                result_sms += f" {position.title.capitalize()} - {highest_vote_candidate.first_name} {highest_vote_candidate.last_name} ({round(highest_vote_percentage,2)}%),\n"
 
         result_sms = result_sms.rstrip(',')  # Remove the trailing comma
         print("result sms",result_sms)
