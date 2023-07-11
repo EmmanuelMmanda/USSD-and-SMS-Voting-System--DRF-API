@@ -5,7 +5,7 @@ from .models import Results, Settings, Voter, Election, Position, Candidate, Vot
 
 
 class VoterAdmin(admin.ModelAdmin):
-    list_display = ('university_id', 'gender', 'date_of_birth', 'phone_number', 'has_vote')
+    list_display = ('university_id', 'gender', 'phone_number', 'has_vote')
     search_fields = ('university_id', 'first_name',
                      'last_name', 'email', 'phone_number')
     list_filter = ('gender',)
@@ -18,8 +18,8 @@ class ElectionAdmin(admin.ModelAdmin):
 
 
 class PositionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'election')
-    search_fields = ('title', 'description', 'election__title')
+    list_display = ('title', 'election')
+    search_fields = ('title',  'election__title')
     list_filter = ('election',)
 
 

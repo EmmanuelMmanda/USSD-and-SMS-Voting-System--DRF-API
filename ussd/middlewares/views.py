@@ -33,7 +33,7 @@ def normalize_phone_number(phone_number):
         raise ValueError(' Invalid phone number')
 
     # Add the "07" prefix to the phone number
-    formatted_phone_number = '07' + phone_number[1:]
+    formatted_phone_number = '0' + phone_number
 
     return formatted_phone_number
 

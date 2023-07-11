@@ -13,7 +13,6 @@ class Voter(models.Model):
     university_id = models.CharField(max_length=20, unique=True)
     phone_number = models.CharField(max_length=15, unique=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField()
     has_vote = models.BooleanField(default=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='voter')
 
@@ -50,7 +49,6 @@ class Election(models.Model):
 
 class Position(models.Model):
     title = models.CharField(max_length=100)
-    description = models.TextField()
     election = models.ForeignKey(Election, on_delete=models.CASCADE)
 
     def __str__(self):
