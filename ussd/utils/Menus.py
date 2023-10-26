@@ -19,12 +19,12 @@ class USSDMenu:
 
     def MainMenu(self):
         if self.lang == 'EN':
-            return self.get_menu('Welcome to Ardhi University Voting System \n'
+            return self.get_menu('Welcome to Ardhi University Voting System @ 2023 \n'
                                  '1. Cast your Vote \n'
                                  '2. View Results \n'
                                  '3. Badili Lugha \n')
         elif self.lang == 'SW':
-            return self.get_menu('Karibu katika mfumo wa kupiga kura - Chuo Cha Ardhi \n'
+            return self.get_menu('Karibu katika mfumo wa kupiga kura - Chuo Cha Ardhi @ 2023 \n'
                                  '1. Piga kura yako \n'
                                  '2. Angalia matokeo \n'
                                  '3. Change Language\n')
