@@ -79,7 +79,7 @@ class USSDMenu:
             return self.get_menu('Umechagua - \n '
                                  '____________________________\n'
                                  f'{formatted_string} \n'
-                                 'Tafadhali chagua \n'
+                                 'Tafadhali chagua, \n'
                                  '1. Thibitisha \n'
                                  '2. Sitisha \n')
 
