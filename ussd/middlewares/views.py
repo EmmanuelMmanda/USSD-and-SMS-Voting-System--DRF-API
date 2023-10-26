@@ -75,7 +75,7 @@ class USSDMiddleware:
                 response = HttpResponse(
                     'END Oops! You are not allowed to participate in ARUSO election, Please contact the administrator(s) to register you.')
                 response['Content-Type'] = 'text/html'
-                SMS().send([init_phone_number], 'Oops! You are not allowed to participate in ARUSO electio, Please contact the administrator(s) to register you.')
+                SMS().send([init_phone_number], 'Oops!! You are not allowed to participate in ARUSO electio, Please contact the administrator(s) to register you.')
                 return response
             # get user preferences and setting
             settings = getSeetingsByUser()
