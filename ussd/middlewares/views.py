@@ -73,7 +73,7 @@ class USSDMiddleware:
             if not user:
                 # User doesn't exist, return an error response
                 response = HttpResponse(
-                    'END Oops!! You are not allowed to participate in ARUSO election, Please contact the administrator(s) to register you.')
+                    'END Oops! You are not allowed to participate in ARUSO election, Please contact the administrator(s) to register you.')
                 response['Content-Type'] = 'text/html'
                 SMS().send([init_phone_number], 'Oops!! You are not allowed to participate in ARUSO electio, Please contact the administrator(s) to register you.')
                 return response
