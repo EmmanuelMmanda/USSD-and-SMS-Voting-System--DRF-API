@@ -19,7 +19,7 @@ class USSDMenu:
 
     def MainMenu(self):
         if self.lang == 'EN':
-            return self.get_menu('Welcome to Ardhi University Voting System @ 2023 \n'
+            return self.get_menu('Welcome to Ardhi University Voting System  2023 \n'
                                  '1. Cast your Vote \n'
                                  '2. View Results \n'
                                  '3. Badili Lugha \n')
